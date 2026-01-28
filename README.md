@@ -20,7 +20,7 @@ This project focuses on building a predictive model to estimate likelihood of Lo
 
 | Name                      | LinkedIn                                                               | Github                                     |
 |---------------------------|------------------------------------------------------------------------|------------------------------------------- |
-| Alexander Yasu Tamai      | https://www.linkedin.com/in/alexander-tamai-6b516432b/                                                                       |                                            |
+| Alexander Tamai      | https://www.linkedin.com/in/alexander-tamai-6b516432b/                                                                       |                                            |
 | Miguel Villano            | https://www.linkedin.com/in/miguel-villano-b88921305/                  | [Link ↗](MiguelVillano)                   |
 | Hamid Mohammad            |                                                                        |                                            |
 
