@@ -5,19 +5,6 @@ app = marimo.App(width="medium")
 
 
 @app.cell
-def _(mo):
-    mo.md(r"""
-    TO DO NEXT TIME:
-
-    Git Repo + Git Commits DONE
-    Process Data into numerical values
-    Do Visualization and Correlation Investigation
-    Maybe start on Logistic Regression???
-    """)
-    return
-
-
-@app.cell
 def _():
     import marimo as mo
     import pandas as pd
@@ -25,7 +12,26 @@ def _():
     import matplotlib.pyplot as plt
     import numpy as np
     import seaborn as sns
-    return mo, pd, plt
+
+    #Logistic Regression
+    from sklearn import metrics
+    from sklearn.linear_model import LogisticRegression
+    return LogisticRegression, metrics, mo, pd, plt
+
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    TO ASK DR. KABERNATHY
+    Ask about how to turn employment status, loan reason etc. into ordinal data.
+    Ask about how to use testing data with no loan_paid_back column
+    TO DO NEXT TIME:
+
+    OPTIMIZE AND TEST AROUND THE LOGISTIC REGRESSION
+    ROC AUC TEST FOR LOG REG
+    START ON NAIVE BAYES
+    """)
+    return
 
 
 @app.cell
@@ -53,7 +59,8 @@ def _(mo):
 def _(mo):
     mo.md(r"""
     ## Business Problem Understanding
-    [README STYLE OVERVIEW]
+
+    This project focuses on building a predictive model to estimate likelihood of Loan Defaults using Customer Demographic, and historical financial data. Key features include credit scores, loan amounts, interest rate, gender, marital status and education. The project closely follows the CRISP-DM methodology for Data Science Projects, which include understanding the problem, understanding the data, processing and cleaning it, analyzing results and determining a conclusion. The project involves data preprocessing steps such as handling missing values and outliers, as well as transforming categorical variables into numerical formats suitable for model training. The models used include statistical classifiers such as Logistic Regression and Naive Bayes and machine learning algorithms including K-Nearest Neighbors, Neural Networks, and Support Vector Machines. Model performance is evaluated by testing against a testing set, split from the training set, and checking its accuracy. The final model will provide insights on which features, or combination thereof, can anticipate a Loan Default.
 
     More Information about columns can be found here:
     https://www.kaggle.com/datasets/nabihazahid/loan-prediction-dataset-2025/data
@@ -71,7 +78,7 @@ def _(mo):
 
 @app.cell
 def _(pd):
-    path = 'train.csv'
+    path = '../train.csv'
     df = pd.read_csv(path)
     return (df,)
 
@@ -170,15 +177,35 @@ def _(mo):
     mo.md(r"""
     ### Correlation Investigation
 
-    Based on domain knowledge, there are some easily
+    Based on domain knowledge, there are some features that we can guess to be important to defaults, such as annual income, education and credit score.
     """)
     return
 
 
 @app.cell
 def _(df):
-    r = df["x"].corr(df["y"])
-    print("Pearson r:", r)
+    r_income = df["annual_income"].corr(df["loan_paid_back"])
+    print("Annual Income Correlation:", r_income)
+
+    print("The result here indicates that a higher annual income leads to a higher chance of paying back the loan.")
+    return
+
+
+@app.cell
+def _(df):
+    r_creditscore = df["credit_score"].corr(df["loan_paid_back"])
+    print("Credit Score Correlation:", r_creditscore)
+
+    print("It seems there is a little correlation between a high credit score and not defaulting.")
+    return
+
+
+@app.cell
+def _(df):
+    r_rate = df["interest_rate"].corr(df["loan_paid_back"])
+    print("Pearson r:", r_rate)
+
+    print("Implied here is that there is a weak correlation between a lower interest rate resulting in a paid back loan.")
     return
 
 
@@ -243,11 +270,96 @@ def _(mo):
 
 @app.cell
 def _(df):
-    df["gender"] = df["gender"].replace({
-        "male": 0,
-        "female": 1,
-        "other": 3
+    c_df = df #Using a new dataframe, cleaned df, for processing. I wish to archive the original data.
+    c_df
+    return (c_df,)
+
+
+@app.cell
+def _(df):
+    df["grade_subgrade"].unique()
+    return
+
+
+@app.cell
+def _(c_df):
+    c_df["gender"] = c_df["gender"].replace({
+        "Male": 0,
+        "Female": 1,
+        "Other": 3
     })
+
+    c_df['marital_status'] = c_df["marital_status"].replace({
+        "Single": 0,
+        "Married": 1,
+        "Divorced": 2,
+        "Widowed": 3
+    })
+
+    c_df['education_level'] = c_df["education_level"].replace({
+        "High School": 0,
+        "Bachelor's": 1,
+        "Master's": 2,
+        "PhD": 3,
+        "Other":4
+    })
+    c_df['employment_status'] = c_df["employment_status"].replace({
+        "Unemployed": 0,
+        "Employed": 1,
+        "Self-employed": 2,
+        "Retired": 3,
+        "Student":4
+    })
+    c_df['loan_purpose'] = c_df["loan_purpose"].replace({
+        "Debt consolidation": 0,
+        "Home": 1,
+        "Education": 2,
+        "Vacation": 3,
+        "Car": 4,
+        "Medical": 5,
+        "Business": 6,   
+        "Other": 7,
+    })
+    c_df["grade_subgrade"] = c_df["grade_subgrade"].replace({
+        "F1": 0,
+        "F2": 0,
+        "F3": 0,
+        "F4": 0,
+        "F5": 0,
+        "E1": 1,
+        "E2": 1,
+        "E3": 1,
+        "E4": 1,
+        "E5": 1,
+        "D1": 2,
+        "D2": 2,
+        "D3": 2,
+        "D4": 2,
+        "D5": 2,
+        "C1": 3,
+        "C2": 3,
+        "C3": 3,
+        "C4": 3,
+        "C5": 3,
+        "B1": 4,
+        "B2": 4,
+        "B3": 4,
+        "B4": 4,
+        "B5": 4,
+        "A1": 5,
+        "A2": 5,
+        "A3": 5,
+        "A4": 5,
+        "A5": 5
+    })
+    return
+
+
+@app.cell
+def _(c_df):
+    #The post-processes database now contains no strings, and all numerical values.
+
+    c_df
     return
 
 
@@ -256,6 +368,145 @@ def _(mo):
     mo.md(r"""
     ## Modeling
     """)
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### Test Train Data Split
+    """)
+    return
+
+
+@app.cell
+def _(c_df):
+    X_train = c_df.drop(columns=["loan_paid_back"])
+    return (X_train,)
+
+
+@app.cell
+def _(c_df):
+
+    Y_train = c_df["loan_paid_back"]
+    return (Y_train,)
+
+
+@app.cell
+def _(pd):
+    #Defining Test Dataframe and Processing it.
+    path2 = '../test.csv'
+    t_df = pd.read_csv(path2)
+
+    t_df["gender"] = t_df["gender"].replace({
+        "Male": 0,
+        "Female": 1,
+        "Other": 3
+    })
+
+    t_df['marital_status'] = t_df["marital_status"].replace({
+        "Single": 0,
+        "Married": 1,
+        "Divorced": 2,
+        "Widowed": 3
+    })
+
+    t_df['education_level'] = t_df["education_level"].replace({
+        "High School": 0,
+        "Bachelor's": 1,
+        "Master's": 2,
+        "PhD": 3,
+        "Other":4
+    })
+    t_df['employment_status'] = t_df["employment_status"].replace({
+        "Unemployed": 0,
+        "Employed": 1,
+        "Self-employed": 2,
+        "Retired": 3,
+        "Student":4
+    })
+    t_df['loan_purpose'] = t_df["loan_purpose"].replace({
+        "Debt consolidation": 0,
+        "Home": 1,
+        "Education": 2,
+        "Vacation": 3,
+        "Car": 4,
+        "Medical": 5,
+        "Business": 6,   
+        "Other": 7,
+    })
+    t_df["grade_subgrade"] = t_df["grade_subgrade"].replace({
+        "F1": 0,
+        "F2": 0,
+        "F3": 0,
+        "F4": 0,
+        "F5": 0,
+        "E1": 1,
+        "E2": 1,
+        "E3": 1,
+        "E4": 1,
+        "E5": 1,
+        "D1": 2,
+        "D2": 2,
+        "D3": 2,
+        "D4": 2,
+        "D5": 2,
+        "C1": 3,
+        "C2": 3,
+        "C3": 3,
+        "C4": 3,
+        "C5": 3,
+        "B1": 4,
+        "B2": 4,
+        "B3": 4,
+        "B4": 4,
+        "B5": 4,
+        "A1": 5,
+        "A2": 5,
+        "A3": 5,
+        "A4": 5,
+        "A5": 5
+    })
+
+    t_df
+    return (t_df,)
+
+
+@app.cell
+def _(t_df):
+    X_test = t_df.drop(columns=["loan_paid_back"])
+
+    Y_test = t_df["loan_paid_back"]
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### Logistic Regression
+    """)
+    return
+
+
+@app.cell
+def _(LogisticRegression, X_train, Y_train, metrics):
+    #I will now employ one of the first and simplest models for the project -- a logistic regression.abs
+
+    # instantiate the model (using the default parameters)
+    logreg = LogisticRegression()
+
+    # fit the model with data
+    model = logreg.fit(X_train, Y_train)
+
+    y_pred = model.predict(X_train)
+
+    #Confusion Matrix for the Logistic Regression
+    logregCnf_matrix = metrics.confusion_matrix(Y_train, y_pred)
+    logregScore = metrics.accuracy_score(Y_train, y_pred)
+    print(logregCnf_matrix)
+    print(logregScore)
+
+    print("Using a simple logistic regression with default settings, we achieve an 82% accuracy using our training data.")
     return
 
 
