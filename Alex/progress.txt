@@ -1,7 +1,4 @@
-this my my file that i will track my progress throughout this project.
-
-1/28: 
-want to do: 
+1/28 - 2/4: 
     - z score
     - tukeys fences
     - handling outliers, if any?
