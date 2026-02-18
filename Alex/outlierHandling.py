@@ -1,4 +1,6 @@
 import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
 from scipy.stats import zscore
 
 # get data 
@@ -46,7 +48,25 @@ rows_with_outlier = outliers_z.any(axis=1)
 # remove them
 trainData_clean = trainData[~rows_with_outlier].copy()
 
-trainData_clean.to_csv("train_clean.csv", index=False)
-#trainData_clean = pd.read_csv("../train_clean.csv")
+#trainData_clean.to_csv("train_clean.csv", index=False)
+trainData_clean = pd.read_csv("./train_clean.csv")
 
 print("CLEANED DATA SET:", trainData_clean)
+# result from cleaned data
+# ------------------------
+# The graph was still right skewed but not as much after removing the outliers. 
+# With the graph being right skewed, suggests log transformation which will 
+# compresses large values and spreads small values. 
+
+# ------------------------------
+# log transform the cleaned data
+# ------------------------------ 
+trainData_clean["log_annual_income"] = np.log1p(trainData_clean["annual_income"])
+
+
+trainData_clean["log_annual_income"].hist(bins=50)
+plt.title("Log(Annual Income) Distribution (Cleaned)")
+plt.xlabel("log_annual_income")
+plt.ylabel("Frequency")
+plt.savefig("log_annual_income_histogram.png")
+plt.show()
