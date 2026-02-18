@@ -1,4 +1,4 @@
-1/28 - 2/4: 
+1/28 - 2/18: 
     - z score
-    - tukeys fences
-    - handling outliers, if any?
+    - handling outliers 
+    - outliers: remove at threshold = 5
