@@ -55,9 +55,9 @@ if not os.path.exists(file_path):
     # File does NOT exist → create it
     trainDataClean.to_csv(file_path, index=False)
     trainDataClean = trainDataClean.copy()
-else:
-    # File exists → read it
-    trainDataClean = pd.read_csv(file_path)
+
+# File exists → read it
+trainDataClean = pd.read_csv(file_path)
 
 # ------------------------
 # Evaluation of cleaned data
@@ -77,7 +77,7 @@ trainDataClean["log_annual_income"].hist(bins=50)
 plt.title("Log(Annual Income) Distribution (Cleaned)")
 plt.xlabel("log_annual_income")
 plt.ylabel("Frequency")
-plt.savefig("log_annual_income_histogram.png")
+plt.savefig("images/log_annual_income_histogram.png")
 plt.show()
 
 # ------------------------
