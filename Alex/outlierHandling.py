@@ -77,7 +77,7 @@ trainDataClean["log_annual_income"].hist(bins=50)
 plt.title("Log(Annual Income) Distribution (Cleaned)")
 plt.xlabel("log_annual_income")
 plt.ylabel("Frequency")
-plt.savefig("images/log_annual_income_histogram.png")
+plt.savefig("../images/log_annual_income_histogram.png")
 plt.show()
 
 # ------------------------

@@ -9,3 +9,4 @@
     - gonna change miguels file to allows for any data set
         - might become a UI
     - not want to see other transformations not just log
+    - unclean will remove the 20 highest annaul incomes
