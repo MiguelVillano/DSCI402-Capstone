@@ -5,50 +5,12 @@ app = marimo.App(width="medium")
 
 
 @app.cell
-<<<<<<< HEAD
 def _():
-=======
-def _(mo):
-    mo.md(r"""
-    TO DO NEXT TIME:
-
-    Git Repo + Git Commits DONE
-    Process Data into numerical values
-    Do Visualization and Correlation Investigation
-    Maybe start on Logistic Regression???
-    """)
-    return
-
-
-@app.cell
-def load_libraries():
-    import subprocess, sys
-
-    # packages we need for this project
-    packages = [
-        "marimo",
-        "pandas",
-        "numpy",
-        "matplotlib",
-        "seaborn",
-        "scikit-learn",
-    ]
-    
-    # import each package, but if there is an error than it will pip install
-    for pkg in packages:
-        try:
-            __import__(pkg if pkg != "scikit-learn" else "sklearn")
-        except ImportError:
-            subprocess.check_call([sys.executable, "-m", "pip", "install", pkg])
-
-    # import
->>>>>>> 75647186436a72a89604480adb59c2da401a7b94
     import marimo as mo
     import pandas as pd
     import numpy as np
     import matplotlib.pyplot as plt
     import seaborn as sns
-<<<<<<< HEAD
 
     #Logistic Regression
     from sklearn import metrics
@@ -69,12 +31,6 @@ def _(mo):
     START ON NAIVE BAYES
     """)
     return
-=======
-    from sklearn import preprocessing
-
-    # return the abbreviations
-    return mo, pd, np, plt, sns, preprocessing
->>>>>>> 75647186436a72a89604480adb59c2da401a7b94
 
 
 @app.cell
