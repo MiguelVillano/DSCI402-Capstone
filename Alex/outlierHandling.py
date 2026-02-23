@@ -30,7 +30,7 @@ print("Outliers per column:")
 print(outlier_counts)
 
 # -------------------------
-# Explanation
+# Explanation of z-score testing 
 # 
 # I am using the z-score outlier detection since the dataset is so large
 # at almost 60,000 rows of data. Choosing a threshold of 5 allows the most 
@@ -52,21 +52,31 @@ trainData_clean = trainData[~rows_with_outlier].copy()
 trainData_clean = pd.read_csv("./train_clean.csv")
 
 print("CLEANED DATA SET:", trainData_clean)
-# result from cleaned data
 # ------------------------
+# Evaluation of cleaned data
+# 
 # The graph was still right skewed but not as much after removing the outliers. 
 # With the graph being right skewed, suggests log transformation which will 
 # compresses large values and spreads small values. 
+# ------------------------
 
 # ------------------------------
 # log transform the cleaned data
 # ------------------------------ 
 trainData_clean["log_annual_income"] = np.log1p(trainData_clean["annual_income"])
 
-
+# plot 
 trainData_clean["log_annual_income"].hist(bins=50)
 plt.title("Log(Annual Income) Distribution (Cleaned)")
 plt.xlabel("log_annual_income")
 plt.ylabel("Frequency")
 plt.savefig("log_annual_income_histogram.png")
 plt.show()
+
+# ------------------------
+# Evaluation of tranformed cleaned data
+# 
+# Applying a log transformation produced a much more symmetric distribution,
+# reducing the influence of very large income values and making the data
+# closer to a normal shape. 
+# ------------------------
