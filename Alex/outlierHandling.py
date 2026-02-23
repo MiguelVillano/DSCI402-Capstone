@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import os
 import matplotlib.pyplot as plt
 from scipy.stats import zscore
 
@@ -46,12 +47,18 @@ print(outlier_counts)
 rows_with_outlier = outliers_z.any(axis=1)
 
 # remove them
-trainData_clean = trainData[~rows_with_outlier].copy()
+trainDataClean = trainData[~rows_with_outlier].copy()
 
-#trainData_clean.to_csv("train_clean.csv", index=False)
-trainData_clean = pd.read_csv("./train_clean.csv")
+file_path = "train_clean.csv"
 
-print("CLEANED DATA SET:", trainData_clean)
+if not os.path.exists(file_path):
+    # File does NOT exist → create it
+    trainDataClean.to_csv(file_path, index=False)
+    trainDataClean = trainDataClean.copy()
+else:
+    # File exists → read it
+    trainDataClean = pd.read_csv(file_path)
+
 # ------------------------
 # Evaluation of cleaned data
 # 
@@ -63,10 +70,10 @@ print("CLEANED DATA SET:", trainData_clean)
 # ------------------------------
 # log transform the cleaned data
 # ------------------------------ 
-trainData_clean["log_annual_income"] = np.log1p(trainData_clean["annual_income"])
+trainDataClean["log_annual_income"] = np.log1p(trainDataClean["annual_income"])
 
 # plot 
-trainData_clean["log_annual_income"].hist(bins=50)
+trainDataClean["log_annual_income"].hist(bins=50)
 plt.title("Log(Annual Income) Distribution (Cleaned)")
 plt.xlabel("log_annual_income")
 plt.ylabel("Frequency")
