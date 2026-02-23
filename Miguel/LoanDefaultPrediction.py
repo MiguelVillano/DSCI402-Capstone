@@ -103,6 +103,12 @@ def _(df):
 
 
 @app.cell
+def _(df):
+    df.max()
+    return
+
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### Missing Data Investigation
@@ -297,7 +303,6 @@ def _(df):
 @app.cell
 def _(pd):
     pd.set_option('future.no_silent_downcasting', True)
-
     return
 
 
@@ -415,7 +420,6 @@ def _(c_df, train_test_split):
 
     X_test = test_df.drop(columns=["loan_paid_back"])
     Y_test = test_df["loan_paid_back"]
-
     return X_test, X_train, Y_test, Y_train
 
 
