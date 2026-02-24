@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from scipy.stats import zscore
 
 # get data 
-trainData = pd.read_csv('../train.csv')
+trainData = pd.read_csv('../data/train.csv')
 
 numeric_cols = trainData.select_dtypes(include="number")
 
@@ -49,7 +49,7 @@ rows_with_outlier = outliers_z.any(axis=1)
 # remove them
 trainDataClean = trainData[~rows_with_outlier].copy()
 
-file_path = "train_clean.csv"
+file_path = "../data/train_clean.csv"
 
 if not os.path.exists(file_path):
     # File does NOT exist → create it
@@ -65,25 +65,4 @@ trainDataClean = pd.read_csv(file_path)
 # The graph was still right skewed but not as much after removing the outliers. 
 # With the graph being right skewed, suggests log transformation which will 
 # compresses large values and spreads small values. 
-# ------------------------
-
-# ------------------------------
-# log transform the cleaned data
-# ------------------------------ 
-trainDataClean["log_annual_income"] = np.log1p(trainDataClean["annual_income"])
-
-# plot 
-trainDataClean["log_annual_income"].hist(bins=50)
-plt.title("Log(Annual Income) Distribution (Cleaned)")
-plt.xlabel("log_annual_income")
-plt.ylabel("Frequency")
-plt.savefig("../images/log_annual_income_histogram.png")
-plt.show()
-
-# ------------------------
-# Evaluation of tranformed cleaned data
-# 
-# Applying a log transformation produced a much more symmetric distribution,
-# reducing the influence of very large income values and making the data
-# closer to a normal shape. 
 # ------------------------

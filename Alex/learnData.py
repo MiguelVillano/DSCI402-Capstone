@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # get data 
-trainData = pd.read_csv('../train.csv')
+trainData = pd.read_csv('../data/train.csv')
 
 # print first 5 rows
 print('Head:', trainData.head())
