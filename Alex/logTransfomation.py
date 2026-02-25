@@ -1,18 +1,27 @@
 import pandas as pd
 import numpy as np
+import os
 import matplotlib.pyplot as plt
 
 # get data 
 trainDataClean = pd.read_csv('../data/train_clean.csv')
-
 
 # ------------------------------
 # log transform the cleaned data
 # ------------------------------ 
 trainDataClean["log_annual_income"] = np.log1p(trainDataClean["annual_income"])
 
+file_path = "../data/train_clean.csv"
+
+if not os.path.exists(file_path):
+    # File does NOT exist → create it
+    trainDataCleanLogTransform.to_csv(file_path, index=False)
+
+# File exists → read it
+trainDataCleanLogTransform = pd.read_csv(file_path)
+    
 # plot 
-trainDataClean["log_annual_income"].hist(bins=50)
+trainDataCleanLogTransform["log_annual_income"].hist(bins=50)
 plt.title("Log(Annual Income) Distribution (Cleaned)")
 plt.xlabel("log_annual_income")
 plt.ylabel("Frequency")
