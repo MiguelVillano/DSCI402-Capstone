@@ -3,10 +3,13 @@
     - handling outliers 
     - outliers: remove at threshold = 5
 
-2/23 - 3/#:
+2/23:
     - now that I have handled the outliers, start:
     - prob waht ever test miguel has done
     - gonna change miguels file to allows for any data set
         - might become a UI
     - not want to see other transformations not just log
     - unclean will remove the 20 highest annaul incomes
+
+2/25: 
+    - finished all transformations and created images
