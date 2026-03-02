@@ -17,6 +17,9 @@ trainDataClean["boxcox_annual_income"], fitted_lambda = boxcox(income_shifted)
 
 print(f"Optimal lambda for Box-Cox: {fitted_lambda:.4f}")
 
+# save to a new CSV file
+trainDataClean.to_csv("../data/train_clean_boxcox.csv", index=False)
+
 # plot 
 trainDataClean["boxcox_annual_income"].hist(bins=50)
 plt.title("Box-Cox(Annual Income) Distribution (Cleaned)")

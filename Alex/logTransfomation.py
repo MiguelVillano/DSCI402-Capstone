@@ -10,6 +10,9 @@ trainDataClean = pd.read_csv('../data/train_clean.csv')
 # ------------------------------ 
 trainDataClean["log_annual_income"] = np.log1p(trainDataClean["annual_income"])
 
+# save to a new CSV file
+trainDataClean.to_csv("../data/train_clean_logged.csv", index=False)
+
 # plot 
 trainDataClean["log_annual_income"].hist(bins=50)
 plt.title("Log(Annual Income) Distribution (Cleaned)")

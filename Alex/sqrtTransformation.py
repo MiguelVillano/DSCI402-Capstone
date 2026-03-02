@@ -10,6 +10,9 @@ trainDataClean = pd.read_csv('../data/train_clean.csv')
 # ------------------------------ 
 trainDataClean["sqrt_annual_income"] = np.sqrt(trainDataClean["annual_income"])
 
+# save to a new CSV file
+trainDataClean.to_csv("../data/train_clean_sqrt.csv", index=False)
+
 # plot 
 trainDataClean["sqrt_annual_income"].hist(bins=50)
 plt.title("Square Root(Annual Income) Distribution (Cleaned)")

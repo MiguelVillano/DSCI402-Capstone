@@ -16,6 +16,9 @@ trainDataClean["yeojohnson_annual_income"] = pt.fit_transform(trainDataClean[["a
 fitted_lambda = pt.lambdas_[0]
 print(f"Optimal lambda for Yeo-Johnson: {fitted_lambda:.4f}")
 
+# save to a new CSV file
+trainDataClean.to_csv("../data/train_clean_yeojohnson.csv", index=False)
+
 # plot 
 trainDataClean["yeojohnson_annual_income"].hist(bins=50)
 plt.title("Yeo-Johnson(Annual Income) Distribution (Cleaned)")
