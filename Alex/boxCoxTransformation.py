@@ -37,3 +37,11 @@ plt.show()
 # more effectively than log or square root, while still preserving the relative
 # differences between incomes.
 # ------------------------
+
+# --------
+# skewness
+# --------
+
+# skewness of annual income
+skew_value = trainDataClean["boxcox_annual_income"].skew()
+print("Skewness:", skew_value)

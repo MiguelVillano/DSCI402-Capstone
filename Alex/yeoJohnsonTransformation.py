@@ -36,3 +36,11 @@ plt.show()
 # handle zero and negative values directly. This makes it a very flexible 
 # option for skewed or non-positive income data.
 # ------------------------
+
+# --------
+# skewness
+# --------
+
+# skewness of annual income
+skew_value = trainDataClean["yeojohnson_annual_income"].skew()
+print("Skewness:", skew_value)

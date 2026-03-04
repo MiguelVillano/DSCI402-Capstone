@@ -66,3 +66,11 @@ trainDataClean = pd.read_csv(file_path)
 # With the graph being right skewed, suggests log transformation which will 
 # compresses large values and spreads small values. 
 # ------------------------
+
+# --------
+# skewness
+# --------
+
+# skewness of annual income
+skew_value = trainDataClean["annual_income"].skew()
+print("Skewness:", skew_value)

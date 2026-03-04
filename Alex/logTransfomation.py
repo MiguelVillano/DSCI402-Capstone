@@ -28,3 +28,11 @@ plt.show()
 # reducing the influence of very large income values and making the data
 # closer to a normal shape. 
 # ------------------------
+
+# --------
+# skewness
+# --------
+
+# skewness of annual income
+skew_value = trainDataClean["log_annual_income"].skew()
+print("Skewness:", skew_value)
