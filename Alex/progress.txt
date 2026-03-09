@@ -1,4 +1,0 @@
-1/28 - 2/18: 
-    - z score
-    - handling outliers 
-    - outliers: remove at threshold = 5

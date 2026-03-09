@@ -5,19 +5,6 @@ app = marimo.App(width="medium")
 
 
 @app.cell
-def _(mo):
-    mo.md(r"""
-    TO DO NEXT TIME:
-
-    Git Repo + Git Commits DONE
-    Process Data into numerical values
-    Do Visualization and Correlation Investigation
-    Maybe start on Logistic Regression???
-    """)
-    return
-
-
-@app.cell
 def _():
     import marimo as mo
     import pandas as pd

@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # get data 
-trainData = pd.read_csv('../train.csv')
+trainData = pd.read_csv('../data/train.csv')
 
 # print first 5 rows
 print('Head:', trainData.head())
@@ -15,5 +15,5 @@ trainData["annual_income"].hist(bins=50)
 plt.title("Annual Income Distribution")
 plt.xlabel("annual_income")
 plt.ylabel("Frequency")
-plt.savefig("trainData.png")
+plt.savefig("../images/trainData.png")
 plt.show()
