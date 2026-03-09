@@ -38,6 +38,39 @@ print(outlier_counts)
 # extreme outliers in our data to be caught. 
 # ------------------------
 
+# -------------------------------
+# tukeys fences outlier detection
+# -------------------------------
+
+# quartiles
+Q1 = trainData["annual_income"].quantile(0.25)
+Q3 = trainData["annual_income"].quantile(0.75)
+
+# IQR
+IQR = Q3 - Q1
+
+# Tukey fences
+lower_fence = Q1 - 2 * IQR
+upper_fence = Q3 + 2 * IQR
+
+print("\n\nLower Fence:", lower_fence)
+print("Upper Fence:", upper_fence)
+
+# identify outliers
+outliers = trainData[(trainData["annual_income"] < lower_fence) | (trainData["annual_income"] > upper_fence)]
+
+print("Number of outliers:", len(outliers))
+
+# ------------------------
+# Explanation of Tukey's Fence
+#
+# Also testing Tukey's Fence to detect the number of outliers.
+# A multiplier of 2 was chosen instead of the traditional 1.5 to be
+# less aggressive with outlier removal. Because the dataset is large and income
+# data tends to naturally contain higher values, using 2*IQR helps retain more
+# legitimate observations while still removing the most extreme values.
+# ------------------------
+
 
 # -----------------------------
 # removing the extreme outliers
