@@ -192,8 +192,6 @@ def _(mo):
 def _(df):
     r_income = df["annual_income"].corr(df["loan_paid_back"])
     print("Annual Income Correlation:", r_income)
-
-    print("The result here indicates that a higher annual income leads to a higher chance of paying back the loan.")
     return
 
 

@@ -30,3 +30,11 @@ plt.show()
 # normalize the data as strongly as a log transformation, it makes
 # the distribution more symmetric and less influenced by extreme outliers.
 # ------------------------
+
+# --------
+# skewness
+# --------
+
+# skewness of annual income
+skew_value = trainDataClean["sqrt_annual_income"].skew()
+print("Skewness:", skew_value)
