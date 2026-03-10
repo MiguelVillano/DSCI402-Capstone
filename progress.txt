@@ -24,4 +24,8 @@
     - miguel is testing normality
     - hamid is testing models
     - create ui for each of the datasets
+
+3/9:
+    - Alex has created the ui and tested tukey's fences
+    - There was no need to test normality, so miguel is now making the model templates to test all data
     
