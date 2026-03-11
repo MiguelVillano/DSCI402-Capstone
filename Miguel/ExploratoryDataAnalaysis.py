@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.20.4"
+__generated_with = "0.19.7"
 app = marimo.App(width="medium")
 
 
@@ -121,7 +121,6 @@ def _(path, pd):
 def _(pd):
     path2 = '../data/train_clean_logged.csv'
     logged_df = pd.read_csv(path2)
-
     return (logged_df,)
 
 
@@ -146,49 +145,41 @@ def _(logged_df):
 
 
 @app.cell
-def _(logged_df, smaller_df):
+def _(logged_df):
     smallest_df = logged_df.sample(n=5000, random_state=42)
-    smaller_df
+    smallest_df
     return (smallest_df,)
 
 
-@app.cell(hide_code=True)
+@app.cell
 def _(mo):
     mo.md(r"""
-    # Visualizations
-    """)
-    return
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""
-    ## Testing Minimized Datasets
+    ## Sampling Investigation
     """)
     return
 
 
 @app.cell
 def _(c_df, sns):
-    sns.violinplot( x=c_df["credit_score"], y=c_df["loan_paid_back"])
+    sns.violinplot( y=c_df["credit_score"], x=c_df["loan_paid_back"])
     return
 
 
 @app.cell
 def _(small_df, sns):
-    sns.violinplot( x=small_df["credit_score"], y=small_df["loan_paid_back"])
+    sns.violinplot( y=small_df["credit_score"], x=small_df["loan_paid_back"])
     return
 
 
 @app.cell
 def _(smaller_df, sns):
-    sns.violinplot( x=smaller_df["credit_score"], y=smaller_df["loan_paid_back"])
+    sns.violinplot( y=smaller_df["credit_score"], x=smaller_df["loan_paid_back"])
     return
 
 
 @app.cell
 def _(smallest_df, sns):
-    sns.violinplot( x=smallest_df["credit_score"], y=smallest_df["loan_paid_back"])
+    sns.violinplot( y=smallest_df["credit_score"], x=smallest_df["loan_paid_back"])
     return
 
 
@@ -202,19 +193,19 @@ def _(mo):
 
 @app.cell
 def _(smallest_df, sns):
-    sns.violinplot( x=smallest_df["loan_amount"], y=smallest_df["loan_paid_back"])
+    sns.boxplot( y=smallest_df["loan_amount"], x=smallest_df["loan_paid_back"])
     return
 
 
 @app.cell
 def _(small_df, sns):
-    sns.violinplot( x=small_df["debt_to_income_ratio"], y=small_df["loan_paid_back"])
+    sns.boxplot( y=small_df["debt_to_income_ratio"], x=small_df["loan_paid_back"])
     return
 
 
 @app.cell
 def _(smaller_df, sns):
-    sns.violinplot( x=smaller_df["interest_rate"], y=smaller_df["loan_paid_back"])
+    sns.boxplot( y=smaller_df["interest_rate"], x=smaller_df["loan_paid_back"])
     return
 
 
