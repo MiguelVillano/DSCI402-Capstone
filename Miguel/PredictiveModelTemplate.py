@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.19.7"
+__generated_with = "0.20.4"
 app = marimo.App(width="medium")
 
 
@@ -11,6 +11,7 @@ def _():
     import numpy as np
     import matplotlib.pyplot as plt
     import seaborn as sns
+    import os
 
     #Logistic Regression
     from sklearn import metrics
@@ -27,9 +28,62 @@ def _():
     #Support Vector Classification
     from sklearn import svm
 
-    path = '../data/train_clean_boxcox.csv'
-    df = pd.read_csv(path)
-    return df, mo, svm, train_test_split
+
+
+    return (
+        CategoricalNB,
+        LogisticRegression,
+        MLPClassifier,
+        accuracy_score,
+        mo,
+        os,
+        pd,
+        svm,
+        train_test_split,
+    )
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ## Dataset Selector
+    """)
+    return
+
+
+@app.cell
+def _(os):
+    # defining the data folder
+    DATA_FOLDER = "../data"
+
+    # list all csv files in folder
+    dataset_files = [
+        f for f in os.listdir(DATA_FOLDER)
+        if f.endswith(".csv")
+    ]
+    return DATA_FOLDER, dataset_files
+
+
+@app.cell
+def _(dataset_files, mo):
+    dataset_selector = mo.ui.dropdown(
+        options=dataset_files,
+        value=dataset_files[0] if dataset_files else None,
+        label="Select Dataset"
+    )
+
+    dataset_selector
+    return (dataset_selector,)
+
+
+@app.cell
+def _(DATA_FOLDER, dataset_selector, os, pd):
+    selected_path = os.path.join(DATA_FOLDER, dataset_selector.value)
+
+    df = pd.read_csv(selected_path)
+
+    df.head()
+    return (df,)
 
 
 @app.cell
@@ -127,11 +181,11 @@ def _(df):
 def _(df, train_test_split):
     train_df, test_df = train_test_split(df, test_size=0.2, random_state=42)
     X_train = train_df.drop(columns=["loan_paid_back"])
-    Y_train = train_df["loan_paid_back"]
+    y_train = train_df["loan_paid_back"]
 
     X_test = test_df.drop(columns=["loan_paid_back"])
-    Y_test = test_df["loan_paid_back"]
-    return
+    y_test = test_df["loan_paid_back"]
+    return X_test, X_train, y_test, y_train
 
 
 @app.cell
@@ -145,7 +199,14 @@ def _(mo):
 
 
 @app.cell
-def _():
+def _(LogisticRegression, X_test, X_train, accuracy_score, y_test, y_train):
+    log_model = LogisticRegression()
+
+    log_model.fit(X_train, y_train)
+    log_preds = log_model.predict(X_test)
+
+    log_acc = accuracy_score(y_test, log_preds)
+    print("Logistic Regression Accuracy:", log_acc)
     return
 
 
@@ -160,7 +221,14 @@ def _(mo):
 
 
 @app.cell
-def _():
+def _(CategoricalNB, X_test, X_train, accuracy_score, y_test, y_train):
+    nb_model = CategoricalNB()
+
+    nb_model.fit(X_train, y_train)
+    nb_preds = nb_model.predict(X_test)
+
+    nb_acc = accuracy_score(y_test, nb_preds)
+    print("Naive Bayes Accuracy:", nb_acc)
     return
 
 
@@ -175,7 +243,14 @@ def _(mo):
 
 
 @app.cell
-def _():
+def _(KNeighborsClassifier, X_test, X_train, accuracy_score, y_test, y_train):
+    knn_model = KNeighborsClassifier()
+
+    knn_model.fit(X_train, y_train)
+    knn_preds = knn_model.predict(X_test)
+
+    knn_acc = accuracy_score(y_test, knn_preds)
+    print("kNN Accuracy:", knn_acc)
     return
 
 
@@ -186,6 +261,18 @@ def _(mo):
 
     https://scikit-learn.org/stable/modules/neural_networks_supervised.html
     """)
+    return
+
+
+@app.cell
+def _(MLPClassifier, X_test, X_train, accuracy_score, y_test, y_train):
+    mlp_model = MLPClassifier()
+
+    mlp_model.fit(X_train, y_train)
+    mlp_preds = mlp_model.predict(X_test)
+
+    mlp_acc = accuracy_score(y_test, mlp_preds)
+    print("Neural Net Accuracy:", mlp_acc)
     return
 
 
@@ -201,10 +288,14 @@ def _(mo):
 
 
 @app.cell
-def _(SVC, X, svm, y):
-    clf = svm.SVC()
-    clf.fit(X, y)
-    SVC()
+def _(X_test, X_train, accuracy_score, svm, y_test, y_train):
+    svm_model = svm.SVC()
+
+    svm_model.fit(X_train, y_train)
+    svm_preds = svm_model.predict(X_test)
+
+    svm_acc = accuracy_score(y_test, svm_preds)
+    print("SVM Accuracy:", svm_acc)
     return
 
 
@@ -218,7 +309,21 @@ def _(mo):
 
 
 @app.cell
-def _():
+def _(
+    RandomForestClassifier,
+    X_test,
+    X_train,
+    accuracy_score,
+    y_test,
+    y_train,
+):
+    rf_model = RandomForestClassifier()
+
+    rf_model.fit(X_train, y_train)
+    rf_preds = rf_model.predict(X_test)
+
+    rf_acc = accuracy_score(y_test, rf_preds)
+    print("Random Forest Accuracy:", rf_acc)
     return
 
 
