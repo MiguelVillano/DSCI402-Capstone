@@ -34,7 +34,6 @@ df = None
 # update table display
 # -----------------------------
 def update_table(data):
-
     info_text.set(
         f"Rows: {data.shape[0]}\n"
         f"Columns: {data.shape[1]}\n"
@@ -59,20 +58,13 @@ def update_table(data):
 # load dataset
 # -----------------------------
 def load_dataset():
-
     global df
-
     dataset_name = dataset_var.get()
-
     if dataset_name == "":
         return
-
     file_path = datasets[dataset_name]
-
     df = pd.read_csv(file_path)
-
     sort_column_dropdown["values"] = list(df.columns)
-
     update_table(df)
 
 
@@ -80,17 +72,12 @@ def load_dataset():
 # sort dataset
 # -----------------------------
 def sort_data(ascending=True):
-
     if df is None:
         return
-
     column = sort_column_var.get()
-
     if column == "":
         return
-
     sorted_df = df.sort_values(by=column, ascending=ascending)
-
     update_table(sorted_df)
 
 
@@ -98,20 +85,14 @@ def sort_data(ascending=True):
 # show histogram image
 # -----------------------------
 def show_distribution():
-
     dataset_name = dataset_var.get()
-
     if dataset_name == "":
         return
-
     img_path = images[dataset_name]
-
     img = Image.open(img_path)
     img = img.resize((750, 450))
-
     global img_tk
     img_tk = ImageTk.PhotoImage(img)
-
     image_label.config(image=img_tk)
 
 

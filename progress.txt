@@ -29,3 +29,6 @@
     - Alex has created the ui and tested tukey's fences
     - There was no need to test normality, so miguel is now making the model templates to test all data
     
+3/30:
+    - need to add miguel and hamid stuff to ui
+    - 
