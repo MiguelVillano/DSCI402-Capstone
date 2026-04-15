@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.20.4"
+__generated_with = "0.23.1"
 app = marimo.App(width="medium")
 
 
@@ -18,29 +18,45 @@ def _():
     from sklearn.linear_model import LogisticRegression
     from sklearn.model_selection import train_test_split
 
-    #Categorical Naive Bayes
-    from sklearn.naive_bayes import CategoricalNB
+    #Multinomial Naive Bayes
+    from sklearn.naive_bayes import MultinomialNB
+
+    #K Nearest Neighbors
+    from sklearn.neighbors import KNeighborsClassifier
 
     #Neural Net
     from sklearn.neural_network import MLPClassifier
     from sklearn.metrics import accuracy_score
 
     #Support Vector Classification
-    from sklearn import svm
+    from sklearn.svm import LinearSVC
+
+    #Random Forest Classifier
+    from sklearn.ensemble import RandomForestClassifier
 
 
 
     return (
-        CategoricalNB,
+        KNeighborsClassifier,
+        LinearSVC,
         LogisticRegression,
         MLPClassifier,
+        MultinomialNB,
+        RandomForestClassifier,
         accuracy_score,
         mo,
         os,
         pd,
-        svm,
+        plt,
         train_test_split,
     )
+
+
+@app.cell
+def _():
+    from sklearn.tree import plot_tree
+
+    return (plot_tree,)
 
 
 @app.cell(hide_code=True)
@@ -200,13 +216,47 @@ def _(mo):
 
 @app.cell
 def _(LogisticRegression, X_test, X_train, accuracy_score, y_test, y_train):
-    log_model = LogisticRegression()
+    log_model = LogisticRegression(
+        solver='lbfgs',
+        max_iter=500,
+        tol=1e-3,
+        random_state=42
+    )
 
     log_model.fit(X_train, y_train)
+
     log_preds = log_model.predict(X_test)
 
     log_acc = accuracy_score(y_test, log_preds)
     print("Logistic Regression Accuracy:", log_acc)
+    return (log_model,)
+
+
+@app.cell
+def _(X_train):
+    feature_names = X_train.columns
+    feature_names
+    return (feature_names,)
+
+
+@app.cell
+def _(feature_names, log_model, pd):
+    coef_df = pd.DataFrame({
+        "Feature": feature_names,
+        "Coefficient": log_model.coef_[0]
+    }).sort_values(by="Coefficient", ascending=False)
+
+    print(coef_df)
+    return (coef_df,)
+
+
+@app.cell
+def _(coef_df, plt):
+    plt.figure(figsize=(10,6))
+    plt.barh(coef_df["Feature"], coef_df["Coefficient"])
+    plt.title("Logistic Regression Feature Coefficients")
+    plt.axvline(0, color='black')
+    plt.show()
     return
 
 
@@ -221,8 +271,8 @@ def _(mo):
 
 
 @app.cell
-def _(CategoricalNB, X_test, X_train, accuracy_score, y_test, y_train):
-    nb_model = CategoricalNB()
+def _(MultinomialNB, X_test, X_train, accuracy_score, y_test, y_train):
+    nb_model = MultinomialNB()
 
     nb_model.fit(X_train, y_train)
     nb_preds = nb_model.predict(X_test)
@@ -266,7 +316,12 @@ def _(mo):
 
 @app.cell
 def _(MLPClassifier, X_test, X_train, accuracy_score, y_test, y_train):
-    mlp_model = MLPClassifier()
+    mlp_model = MLPClassifier(
+        hidden_layer_sizes=(32,),
+        max_iter=50,
+        early_stopping=True,
+        random_state=42
+    )
 
     mlp_model.fit(X_train, y_train)
     mlp_preds = mlp_model.predict(X_test)
@@ -288,10 +343,15 @@ def _(mo):
 
 
 @app.cell
-def _(X_test, X_train, accuracy_score, svm, y_test, y_train):
-    svm_model = svm.SVC()
+def _(LinearSVC, X_test, X_train, accuracy_score, y_test, y_train):
+    svm_model = LinearSVC(
+        C=1.0,
+        max_iter=5000,
+        random_state=42
+    )
 
     svm_model.fit(X_train, y_train)
+
     svm_preds = svm_model.predict(X_test)
 
     svm_acc = accuracy_score(y_test, svm_preds)
@@ -317,13 +377,97 @@ def _(
     y_test,
     y_train,
 ):
-    rf_model = RandomForestClassifier()
+    rf_model = RandomForestClassifier(
+        n_estimators=50,
+        max_depth=10,
+        n_jobs=-1,
+        random_state=42
+    )
 
     rf_model.fit(X_train, y_train)
+
     rf_preds = rf_model.predict(X_test)
 
     rf_acc = accuracy_score(y_test, rf_preds)
     print("Random Forest Accuracy:", rf_acc)
+    return (rf_model,)
+
+
+@app.cell
+def _(feature_names, pd, rf_model):
+    importance_df = pd.DataFrame({
+        "Feature": feature_names,
+        "Importance": rf_model.feature_importances_
+    }).sort_values(by="Importance", ascending=False)
+
+    print(importance_df)
+    return
+
+
+@app.cell
+def _(feature_names, plot_tree, plt, rf_model):
+    # Select one tree from the forest
+    individual_tree = rf_model.estimators_[0]
+
+    # Plot tree
+    plt.figure(figsize=(20,10))
+
+    plot_tree(
+        individual_tree,
+        feature_names=feature_names,
+        class_names=["0", "1"],   # Binary classification labels
+        filled=True,
+        max_depth=6               # Keeps plot readable
+    )
+
+    plt.show()
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ### Smaller Tree
+    """)
+    return
+
+
+@app.cell
+def _(
+    RandomForestClassifier,
+    X_test,
+    X_train,
+    accuracy_score,
+    y_test,
+    y_train,
+):
+    rf_model2 = RandomForestClassifier(
+        n_estimators=50,
+        max_depth=6,   # or 8–10 max
+        random_state=0
+    )
+
+    rf_model2.fit(X_train, y_train)
+
+    rf_preds2 = rf_model2.predict(X_test)
+
+    rf_acc2 = accuracy_score(y_test, rf_preds2)
+    print("Random Forest Accuracy:", rf_acc2)
+    return (rf_model2,)
+
+
+@app.cell
+def _(X_train, rf_model2, y_train):
+    from supertree import SuperTree
+
+    st = SuperTree(
+        rf_model2,
+        X_train.to_numpy(),
+        y_train.to_numpy().astype(int),   # FIX HERE
+        feature_names=X_train.columns
+    )
+
+    st.show_tree(which_tree=0)
     return
 
 
