@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.23.1"
+__generated_with = "0.19.7"
 app = marimo.App(width="medium")
 
 
@@ -18,7 +18,6 @@ def _():
     from sklearn.model_selection import train_test_split
     from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
     from sklearn import metrics
-
 
 
     return (
@@ -40,14 +39,12 @@ def _():
     from sklearn.decomposition import PCA
     from sklearn.metrics import roc_curve, roc_auc_score
 
-
     return PCA, StandardScaler, roc_auc_score, roc_curve
 
 
 @app.cell
 def _():
     import statsmodels.api as sm
-
     return (sm,)
 
 
@@ -176,7 +173,6 @@ def _(df):
         "A5": 29
     })
 
-
     return
 
 
@@ -208,7 +204,7 @@ def _(mo):
 
 
 @app.cell
-def _(LogisticRegression, X_test, X_train, y_train):
+def _(LogisticRegression):
     log_model = LogisticRegression(
         solver='lbfgs',
         max_iter=500,
@@ -216,11 +212,15 @@ def _(LogisticRegression, X_test, X_train, y_train):
         class_weight='balanced',
         random_state=42
     )
+    return (log_model,)
 
+
+@app.cell
+def _(X_test, X_train, log_model, y_train):
     log_model.fit(X_train, y_train)
 
     log_preds = log_model.predict(X_test)
-    return log_model, log_preds
+    return (log_preds,)
 
 
 @app.cell
@@ -356,12 +356,14 @@ def _(vif_data):
 def _(X_train, pd, variance_inflation_factor):
     # Since the R2 are relatively similar, we will remove Annual Income since in the original Logistic Regression, it was the weakest feature. We will also remove credit_score since it is involved in Grade_Subgrade
 
-    X_vif2 = X_train.drop(columns=["gender","marital_status","education_level","employment_status","loan_purpose","grade_subgrade","id","yeojohnson_annual_income","credit_score"])
+    X_vif2 = X_train.drop(columns=["gender","marital_status","education_level","employment_status","loan_purpose","grade_subgrade","id"])
     vif_data2 = pd.DataFrame()
     vif_data2["Feature"] = X_vif2.columns
     vif_data2["VIF"] = [variance_inflation_factor(X_vif2.values, i) for i in range(X_vif2.shape[1])]
 
     print(vif_data2)
+
+    # Run PCA on Credit Score, Interest Rate, and Annual Income to minimize the feature into just one with all the knowledge.
     return
 
 
@@ -397,7 +399,6 @@ def _(X_test3, X_train3, log_model, y_train3):
 def _(accuracy_score, log_preds3, y_test3):
     log_acc3 = accuracy_score(y_test3, log_preds3)
     print("Logistic Regression Accuracy:", log_acc3)
-
     return
 
 
@@ -433,6 +434,8 @@ def _(coef_df3, plt):
     plt.title("Logistic Regression Feature Coefficients")
     plt.axvline(0, color='black')
     plt.show()
+
+    #Run a Logistic Regression on just Debt to income Ratio and Employment Status
     return
 
 
@@ -445,25 +448,13 @@ def _(mo):
 
 
 @app.cell
-def _(LogisticRegression):
-    log_model = LogisticRegression(
-        solver='lbfgs',
-        max_iter=500,
-        tol=1e-3,
-        class_weight='balanced',
-        random_state=42
-    )
-    return (log_model,)
-
-
-@app.cell
 def _(StandardScaler, X_test, X_train):
     #This fourth test will apply PCA to fully eliminate the Multicollinearity still plaguing the dataset. Tests show that removing dominant features simply make way for another feature to become dominant, indicating that knowledge in the dataset is covered by all datasets.
 
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(X_train)
     X_test_scaled = scaler.transform(X_test)
-    return X_test_scaled, X_train_scaled
+    return X_test_scaled, X_train_scaled, scaler
 
 
 @app.cell
@@ -543,7 +534,6 @@ def _(
 
     print("PCA: ", confusion_matrix(y_test4, log_preds4))
     print("Lowered Threshold PCA: ", confusion_matrix(y_test4, pca_custom_appPreds))
-
     return
 
 
@@ -625,6 +615,198 @@ def _(X_train3_cleaned, sm, y_train):
     result = model.fit()
 
     print(result.summary())
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## PCA to make Financial Status
+    """)
+    return
+
+
+@app.cell
+def _(df, pd):
+    pca_FI = pd.DataFrame
+    pca_FI = df.drop(columns=["annual_income","loan_amount","gender","marital_status","education_level","employment_status","loan_purpose","grade_subgrade","interest_rate","loan_paid_back","id"])
+    return (pca_FI,)
+
+
+@app.cell
+def _(pca_FI):
+    pca_FI
+    return
+
+
+@app.cell
+def _(PCA, pca_FI, scaler):
+    pcaModel_FI = PCA(n_components=1)
+    pca_FI_scaled = scaler.fit_transform(pca_FI)
+    FI_pca = pcaModel_FI.fit_transform(pca_FI_scaled)
+    return (FI_pca,)
+
+
+@app.cell
+def _(FI_pca):
+    FI_pca
+    return
+
+
+@app.cell
+def _(FI_pca, df, train_test_split):
+    df["Financials"] = FI_pca
+
+    train_df2, test_df2 = train_test_split(df, test_size=0.2, random_state=42)
+    X_train5 = train_df2.drop(columns=["loan_paid_back","annual_income","yeojohnson_annual_income","credit_score","debt_to_income_ratio"])
+    y_train5 = train_df2["loan_paid_back"]
+
+    X_test5 = test_df2.drop(columns=["loan_paid_back","annual_income","yeojohnson_annual_income","credit_score","debt_to_income_ratio"])
+    y_test5 = test_df2["loan_paid_back"]
+    return X_test5, X_train5, test_df2, train_df2, y_test5, y_train5
+
+
+@app.cell
+def _(X_test5, X_train5, log_model, y_train5):
+    log_model.fit(X_train5, y_train5)
+
+    log_preds5 = log_model.predict(X_test5)
+    return (log_preds5,)
+
+
+@app.cell
+def _(accuracy_score, log_preds5, y_test5):
+    log_acc5 = accuracy_score(y_test5, log_preds5)
+    print("Logistic Regression Accuracy:", log_acc5)
+    return
+
+
+@app.cell
+def _(X_train5, log_model, pd):
+    feature_names5 = X_train5.columns
+
+    coef_df5 = pd.DataFrame({
+        "Feature": feature_names5,
+        "Coefficient": log_model.coef_[0]
+    }).sort_values(by="Coefficient", ascending=False)
+
+    print(coef_df5)
+    return (coef_df5,)
+
+
+@app.cell
+def _(coef_df5, plt):
+
+    plt.figure(figsize=(10,6))
+    plt.barh(coef_df5["Feature"], coef_df5["Coefficient"])
+    plt.title("Logistic Regression Feature Coefficients")
+    plt.axvline(0, color='black')
+    plt.show()
+    return
+
+
+@app.cell
+def _(confusion_matrix, log_preds5, y_test5):
+    print("Old Confusion Matrix: ", confusion_matrix(y_test5, log_preds5))
+    return
+
+
+@app.cell
+def _(
+    X_test5,
+    X_train5,
+    log_model,
+    plt,
+    roc_auc_score,
+    roc_curve,
+    y_test5,
+    y_train5,
+):
+    # train
+    log_model.fit(X_train5, y_train5)
+
+    # predict
+    probs5 = log_model.predict_proba(X_test5)[:, 1]
+
+    # ROC
+    fpr5, tpr5, _ = roc_curve(y_test5, probs5)
+    auc5 = roc_auc_score(y_test5, probs5)
+
+    print("AUC:", auc5)
+
+    plt.plot(fpr5, tpr5, label=f"AUC = {auc5:.3f}")
+    plt.plot([0, 1], [0, 1], linestyle='--')
+    plt.legend()
+    plt.show()
+    return (fpr5,)
+
+
+@app.cell
+def _(test_df2, train_df2):
+    X_train6 = train_df2.drop(columns=["loan_paid_back","annual_income","yeojohnson_annual_income","credit_score","debt_to_income_ratio","id","loan_amount","interest_rate","gender","marital_status","education_level","loan_purpose"])
+    y_train6 = train_df2["loan_paid_back"]
+
+    X_test6 = test_df2.drop(columns=["loan_paid_back","annual_income","yeojohnson_annual_income","credit_score","debt_to_income_ratio","id","loan_amount","interest_rate","gender","marital_status","education_level","loan_purpose"])
+    y_test6 = test_df2["loan_paid_back"]
+    return X_test6, X_train6, y_test6, y_train6
+
+
+@app.cell
+def _(X_test6, X_train6, log_model, y_train6):
+    log_model.fit(X_train6, y_train6)
+
+    log_preds6 = log_model.predict(X_test6)
+    return (log_preds6,)
+
+
+@app.cell
+def _(accuracy_score, log_preds6, y_test6):
+    log_acc6 = accuracy_score(y_test6, log_preds6)
+    print("Logistic Regression Accuracy:", log_acc6)
+    return
+
+
+@app.cell
+def _(X_train6, log_model, pd):
+    feature_names6 = X_train6.columns
+
+    coef_df6 = pd.DataFrame({
+        "Feature": feature_names6,
+        "Coefficient": log_model.coef_[0]
+    }).sort_values(by="Coefficient", ascending=False)
+
+    print(coef_df6)
+    return
+
+
+@app.cell
+def _(
+    X_test6,
+    X_train6,
+    fpr5,
+    log_model,
+    plt,
+    roc_auc_score,
+    roc_curve,
+    y_test6,
+    y_train6,
+):
+    # train
+    log_model.fit(X_train6, y_train6)
+
+    # predict
+    probs6 = log_model.predict_proba(X_test6)[:, 1]
+
+    # ROC
+    fpr6, tpr6, _ = roc_curve(y_test6, probs6)
+    auc6 = roc_auc_score(y_test6, probs6)
+
+    print("AUC:", auc6)
+
+    plt.plot(fpr5, tpr6, label=f"AUC = {auc6:.3f}")
+    plt.plot([0, 1], [0, 1], linestyle='--')
+    plt.legend()
+    plt.show()
     return
 
 
