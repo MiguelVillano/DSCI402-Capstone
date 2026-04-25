@@ -32,3 +32,9 @@
 3/30:
     - need to add miguel and hamid stuff to ui
     - 
+
+4/20:
+    - ui going good - hamid stuff going goog and miguels stuff is next
+    - miguels: add PCA and we will have his code and stuff for the presentation
+    - most likely not done by wed 4/22, but mon 4/27 for sure
+    

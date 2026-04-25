@@ -255,7 +255,6 @@ def decision_tree(X_train, X_test, y_train, y_test):
     
     return dt_acc
 
-
 # -----------------------------
 # train model
 # -----------------------------
@@ -310,7 +309,6 @@ def train_model():
     except Exception as e:
         print(f"Error:\n{e}")
         model_result.set(f"Error: {e}")
-
 
 # -----------------------------
 # UI
