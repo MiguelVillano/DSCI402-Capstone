@@ -23,7 +23,7 @@ outliers_z = (abs(z_scores) > threshold)
 
 # Get rows with any outlier
 outlier_rows_z = trainData[outliers_z.any(axis=1)]
-print(outlier_rows_z)
+# print(outlier_rows_z)
 
 # Outlier count per column
 outlier_counts = outliers_z.sum().sort_values(ascending=False)
@@ -41,6 +41,7 @@ print(outlier_counts)
 # -------------------------------
 # tukeys fences outlier detection
 # -------------------------------
+print('\n\nTUKEYS FENCES OUTLIER DETECTION:')
 
 # quartiles
 Q1 = trainData["annual_income"].quantile(0.25)
@@ -53,7 +54,7 @@ IQR = Q3 - Q1
 lower_fence = Q1 - 2 * IQR
 upper_fence = Q3 + 2 * IQR
 
-print("\n\nLower Fence:", lower_fence)
+print("Lower Fence:", lower_fence)
 print("Upper Fence:", upper_fence)
 
 # identify outliers
@@ -106,4 +107,4 @@ trainDataClean = pd.read_csv(file_path)
 
 # skewness of annual income
 skew_value = trainDataClean["annual_income"].skew()
-print("Skewness:", skew_value)
+print("\n\nSkewness:", skew_value)
