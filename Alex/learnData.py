@@ -17,3 +17,7 @@ plt.xlabel("annual_income")
 plt.ylabel("Frequency")
 plt.savefig("../images/trainData.png")
 plt.show()
+
+# skewness of annual income
+skew_value = trainData["annual_income"].skew()
+print("\n\nSkewness:", skew_value)
