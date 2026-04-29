@@ -37,6 +37,18 @@ images = {
     "YeoJohnson Transform": "images/yeojohnson_annual_income_histogram.png",
 }
 
+# -----------------------------
+# skewnesses
+# -----------------------------
+skews = {
+    "Trained": 1.7195,
+    "Cleaned": 1.2297,
+    "Log Transform": -0.3909,
+    "SQRT Transform": 0.3567,
+    "BoxCox Transform": -0.0111,
+    "YeoJohnson Transform": -0.0111,
+}
+
 # globals
 df = None
 original_df = None
@@ -45,12 +57,19 @@ original_df = None
 # update table
 # -----------------------------
 def update_table(data):
+    dataset_name = dataset_var.get()
+    skew_value = skews.get(dataset_name, 0)
+
     info_text.set(
         f"Rows: {data.shape[0]}\n"
         f"Columns: {data.shape[1]}\n"
         f"Column Names: {', '.join(data.columns)}"
     )
-
+    
+    bold_text.set(
+        f"\nSkewness: {skew_value:.4f}"
+    )
+    
     for row in table.get_children():
         table.delete(row)
 
@@ -376,6 +395,8 @@ plot_button.pack(pady=10)
 # info
 info_text = tk.StringVar()
 ttk.Label(root, textvariable=info_text, justify="left").pack(pady=10)
+bold_text = tk.StringVar()
+ttk.Label(root, textvariable=bold_text, justify="left", font=("Arial", 10, "bold")).pack(pady=10)
 
 # table
 table_frame = ttk.Frame(root)
