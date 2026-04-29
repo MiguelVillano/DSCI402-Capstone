@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.19.7"
+__generated_with = "0.23.1"
 app = marimo.App(width="medium")
 
 
@@ -26,6 +26,7 @@ def _():
         classification_report,
         confusion_matrix,
         mo,
+        np,
         os,
         pd,
         plt,
@@ -45,6 +46,7 @@ def _():
 @app.cell
 def _():
     import statsmodels.api as sm
+
     return (sm,)
 
 
@@ -172,7 +174,6 @@ def _(df):
         "A4": 28,
         "A5": 29
     })
-
     return
 
 
@@ -629,7 +630,7 @@ def _(mo):
 @app.cell
 def _(df, pd):
     pca_FI = pd.DataFrame
-    pca_FI = df.drop(columns=["annual_income","loan_amount","gender","marital_status","education_level","employment_status","loan_purpose","grade_subgrade","interest_rate","loan_paid_back","id"])
+    pca_FI = df[["credit_score","yeojohnson_annual_income","interest_rate"]]
     return (pca_FI,)
 
 
@@ -658,10 +659,10 @@ def _(FI_pca, df, train_test_split):
     df["Financials"] = FI_pca
 
     train_df2, test_df2 = train_test_split(df, test_size=0.2, random_state=42)
-    X_train5 = train_df2.drop(columns=["loan_paid_back","annual_income","yeojohnson_annual_income","credit_score","debt_to_income_ratio"])
+    X_train5 = train_df2.drop(columns=["loan_paid_back","id","annual_income","yeojohnson_annual_income","credit_score","interest_rate","grade_subgrade"])
     y_train5 = train_df2["loan_paid_back"]
 
-    X_test5 = test_df2.drop(columns=["loan_paid_back","annual_income","yeojohnson_annual_income","credit_score","debt_to_income_ratio"])
+    X_test5 = test_df2.drop(columns=["loan_paid_back","id","annual_income","yeojohnson_annual_income","credit_score","interest_rate","grade_subgrade"])
     y_test5 = test_df2["loan_paid_back"]
     return X_test5, X_train5, test_df2, train_df2, y_test5, y_train5
 
@@ -706,6 +707,30 @@ def _(coef_df5, plt):
 
 
 @app.cell
+def _(np, y_train5):
+    ytrain5_array = np.asarray(y_train5)
+    return
+
+
+@app.cell
+def _(X_train5, pd, sm, y_train5):
+    # add intercept (VERY important)
+
+    X_array5 = X_train5.apply(pd.to_numeric, errors="coerce")
+    y_array5 = pd.to_numeric(y_train5, errors="coerce")
+
+    X_sm5 = sm.add_constant(X_array5)
+
+    # fit model
+    logit_model5 = sm.Logit(y_array5, X_sm5)
+    result5 = logit_model5.fit()
+
+    # print full summary (includes p-values)
+    print(result5.summary())
+    return
+
+
+@app.cell
 def _(confusion_matrix, log_preds5, y_test5):
     print("Old Confusion Matrix: ", confusion_matrix(y_test5, log_preds5))
     return
@@ -738,15 +763,21 @@ def _(
     plt.plot([0, 1], [0, 1], linestyle='--')
     plt.legend()
     plt.show()
-    return (fpr5,)
+    return
+
+
+@app.cell
+def _(classification_report, log_preds5, y_test5):
+    print("Classification Report: ", classification_report(y_test5, log_preds5))
+    return
 
 
 @app.cell
 def _(test_df2, train_df2):
-    X_train6 = train_df2.drop(columns=["loan_paid_back","annual_income","yeojohnson_annual_income","credit_score","debt_to_income_ratio","id","loan_amount","interest_rate","gender","marital_status","education_level","loan_purpose"])
+    X_train6 = train_df2[["Financials","debt_to_income_ratio","employment_status"]]
     y_train6 = train_df2["loan_paid_back"]
 
-    X_test6 = test_df2.drop(columns=["loan_paid_back","annual_income","yeojohnson_annual_income","credit_score","debt_to_income_ratio","id","loan_amount","interest_rate","gender","marital_status","education_level","loan_purpose"])
+    X_test6 = test_df2[["Financials","debt_to_income_ratio","employment_status"]]
     y_test6 = test_df2["loan_paid_back"]
     return X_test6, X_train6, y_test6, y_train6
 
@@ -783,7 +814,6 @@ def _(X_train6, log_model, pd):
 def _(
     X_test6,
     X_train6,
-    fpr5,
     log_model,
     plt,
     roc_auc_score,
@@ -803,9 +833,98 @@ def _(
 
     print("AUC:", auc6)
 
-    plt.plot(fpr5, tpr6, label=f"AUC = {auc6:.3f}")
+    plt.plot(fpr6, tpr6, label=f"AUC = {auc6:.3f}")
     plt.plot([0, 1], [0, 1], linestyle='--')
     plt.legend()
+    plt.show()
+    return
+
+
+@app.cell
+def _(classification_report, log_preds6, y_test6):
+    print("Classification Report: ", classification_report(y_test6, log_preds6))
+    return
+
+
+@app.cell
+def _(pd, train_df2, variance_inflation_factor):
+    X_vif3 = train_df2[["Financials","debt_to_income_ratio","loan_amount"]]
+    vif_data3 = pd.DataFrame()
+    vif_data3["Feature"] = X_vif3.columns
+    vif_data3["VIF"] = [variance_inflation_factor(X_vif3.values, i) for i in range(X_vif3.shape[1])]
+
+    print(vif_data3)
+    return
+
+
+@app.cell
+def _(accuracy_score, log_model, test_df2, train_df2):
+    X_train7 = train_df2.drop(columns=["loan_paid_back","id","annual_income","yeojohnson_annual_income","credit_score","interest_rate","debt_to_income_ratio","employment_status"])
+    y_train7 = train_df2["loan_paid_back"]
+
+    X_test7 = test_df2.drop(columns=["loan_paid_back","id","annual_income","yeojohnson_annual_income","credit_score","interest_rate","debt_to_income_ratio","employment_status"])
+    y_test7 = test_df2["loan_paid_back"]
+
+    log_model.fit(X_train7, y_train7)
+
+    log_preds7 = log_model.predict(X_test7)
+
+    log_acc7 = accuracy_score(y_test7, log_preds7)
+    print("Logistic Regression Accuracy:", log_acc7)
+    return (X_train7,)
+
+
+@app.cell
+def _(X_train7, log_model, pd):
+    feature_names7 = X_train7.columns
+
+    coef_df7 = pd.DataFrame({
+        "Feature": feature_names7,
+        "Coefficient": log_model.coef_[0]
+    }).sort_values(by="Coefficient", ascending=False)
+
+    print(coef_df7)
+    return (coef_df7,)
+
+
+@app.cell
+def _(coef_df7, plt):
+    plt.figure(figsize=(10,6))
+    plt.barh(coef_df7["Feature"], coef_df7["Coefficient"])
+    plt.title("Logistic Regression Feature Coefficients")
+    plt.axvline(0, color='black')
+    plt.show()
+    return
+
+
+@app.cell
+def _(accuracy_score, log_model, pd, plt, test_df2, train_df2):
+    X_train8 = train_df2[["yeojohnson_annual_income","credit_score","interest_rate"]]
+    y_train8 = train_df2["loan_paid_back"]
+
+    X_test8 = test_df2[["yeojohnson_annual_income","credit_score","interest_rate"]]
+    y_test8 = test_df2["loan_paid_back"]
+
+    log_model.fit(X_train8, y_train8)
+
+    log_preds8 = log_model.predict(X_test8)
+
+    log_acc8 = accuracy_score(y_test8, log_preds8)
+    print("Logistic Regression Accuracy:", log_acc8)
+
+    feature_names8 = X_train8.columns
+
+    coef_df8 = pd.DataFrame({
+        "Feature": feature_names8,
+        "Coefficient": log_model.coef_[0]
+    }).sort_values(by="Coefficient", ascending=False)
+
+    print(coef_df8)
+
+    plt.figure(figsize=(10,6))
+    plt.barh(coef_df8["Feature"], coef_df8["Coefficient"])
+    plt.title("Logistic Regression Feature Coefficients")
+    plt.axvline(0, color='black')
     plt.show()
     return
 
